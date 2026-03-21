@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="360" viewBox="0 0 800 360" fill="none">
+  <rect width="800" height="360" fill="#fff"/>
+  <text x="80" y="48" font-family="system-ui,sans-serif" font-size="20" fill="#000">kWh / month (illustrative)</text>
+  <path d="M80 300 V80 H720" stroke="#000" stroke-width="2"/>
+  <rect x="140" y="180" width="80" height="120" fill="#000"/>
+  <rect x="280" y="140" width="80" height="160" fill="#ccc" stroke="#000" stroke-width="2"/>
+  <text x="180" y="330" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#000">before</text>
+  <text x="320" y="330" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#000">after</text>
+</svg>

@@ -1,0 +1,34 @@
+---
+interface Props {
+  leftColor?: string;
+  rightColor?: string;
+  stepHeight?: string;
+  stitchWidth?: string;
+  trackOffset?: string;
+  class?: string;
+}
+
+const {
+  leftColor = 'var(--footer-surface)',
+  rightColor = 'var(--bg)',
+  stepHeight = '8rem',
+  stitchWidth = '7rem',
+  trackOffset = '2rem',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={['section-stitch', className]}
+  style={`--section-stitch-left:${leftColor};--section-stitch-right:${rightColor};--section-stitch-height:${stepHeight};--section-stitch-width:${stitchWidth};--section-stitch-track-offset:${trackOffset};`}
+  aria-hidden="true"
+>
+  <div class="section-stitch__upper"></div>
+  <div class="section-stitch__lower"></div>
+  <span class="section-stitch__center"></span>
+  <div class="section-stitch__track">
+    <span class="section-stitch__square"></span>
+    <span class="section-stitch__lead"></span>
+    <span class="section-stitch__line"></span>
+  </div>
+</div>

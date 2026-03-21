@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#fff"/>
+  <rect x="80" y="200" width="1040" height="280" fill="#fff" stroke="#000" stroke-width="4"/>
+  <path d="M200 380 L200 280 M320 380 L320 260 M440 380 L440 300" stroke="#000" stroke-width="6" stroke-linecap="square"/>
+  <rect x="520" y="240" width="200" height="120" fill="#f5f5f5" stroke="#000" stroke-width="3"/>
+  <text x="620" y="315" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" fill="#000">kWh</text>
+  <rect x="780" y="250" width="300" height="100" fill="#fff" stroke="#000" stroke-width="3"/>
+  <text x="930" y="310" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" fill="#000">grid</text>
+</svg>

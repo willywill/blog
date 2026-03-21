@@ -1,0 +1,78 @@
+---
+title: 'A case for DLSS 5'
+description: 'DLSS should evolve from a developer feature into an open, enthusiast-driven generative rendering layer.'
+pubDate: 2026-03-20
+cover: ../../assets/blog/dlss5-cover.jpg
+draft: false
+---
+
+import BeforeAfter from '../../components/mdx/BeforeAfter.jsx';
+import framegen from '../../assets/blog/dlss-framegen.jpg';
+
+We're approaching a point where real-time rendering is no longer just rasterization plus a few tricks. It's becoming a hybrid system — part simulation, part reconstruction, part generation. DLSS is already proof of that.
+
+But DLSS, as it exists today, is positioned incorrectly.
+
+---
+
+## It's not a feature. It's a layer.
+
+The official framing treats DLSS like a developer-integrated upscaling feature — something a studio opts into, tunes per-title, and ships inside a specific build. But that description undersells what it actually does. Functionally, DLSS behaves more like a post-render generative system that reconstructs reality from incomplete data. Motion vectors, depth, color — fed into a model that fills in what the GPU never actually computed.
+
+That distinction matters more than it might seem. Because once you accept that framing, the next question becomes obvious: why does this layer belong to the game?
+
+---
+
+## The current model is a bottleneck
+
+Right now, DLSS requires explicit developer buy-in at the engine level. Every integration is a one-off. Adoption is inconsistent, experimentation is limited, and any meaningful innovation has to route through a studio's shipping schedule. The people most willing to push on this stuff — modders, enthusiasts, the people running custom ReShade stacks and frame pacing tools — are locked out entirely.
+
+That's a strange situation for technology that's supposed to be a platform-level capability.
+
+---
+
+## Think ReShade, but generative
+
+We already have a template for what player-owned graphics tooling looks like. ReShade proved that players are happy to inject their own visual layer after the game has rendered. Community graphics mods proved that enthusiasts will experiment aggressively when the tooling lets them. Those tools hook into the render pipeline, operate post-process, and are owned entirely by the player — not the studio.
+
+Now imagine that, but instead of color grading and ambient occlusion: frame generation, temporal reconstruction, hallucinated detail.
+
+The rendering pipeline already looks something like this:
+
+```txt
+Game renders -> Motion vectors + depth + color
+             -> DLSS layer reconstructs -> Final frame
+```
+
+That's already much closer to reality than the way people usually talk about DLSS. The model is no longer *game renders → final image*. It's:
+
+```txt
+Game renders -> Incomplete visual substrate -> Generative image layer -> Final image
+```
+
+That's a different category of technology. And it implies a different ownership model.
+
+---
+
+## What changes if the player owns the layer
+
+If DLSS lived closer to the player than the game, a lot changes immediately. Players could tune reconstruction aggressiveness the way they tune sharpening today. They could swap models without waiting on official patches, experiment with different profiles for different genres, mod the rendering layer the same way they already mod UI, camera, and post-processing. Studios would still provide the motion vectors and depth — the raw substrate. But the final reconstruction stack would stop being a fragile integration buried inside a specific shipping build.
+
+This is also just the natural next step for PC gaming. The enthusiast community has always lived one layer deeper than the official experience: custom INI tweaks, driver overrides, ReShade passes, latency tools, frame pacing utilities. DLSS should fit into that culture rather than being sealed away from it.
+
+---
+
+## The real argument
+
+<BeforeAfter
+  beforeLabel="Rendered frame"
+  afterLabel="Generated frame"
+  beforeSrc={framegen}
+  afterSrc={framegen}
+  alt="A side-by-side placeholder for a future DLSS frame generation comparison"
+  client:visible
+/>
+
+The case for "DLSS 5" isn't that NVIDIA should ship a slightly better SDK. It's that this technology should graduate into a player-facing rendering layer — configurable, swappable, inspectable, moddable. The closed-box model made sense when DLSS was a neat upscaling trick. It makes less sense when the technology is doing something closer to generative reconstruction.
+
+The game should provide the world. The generative layer should let the player decide how that world gets reconstructed on their machine.
