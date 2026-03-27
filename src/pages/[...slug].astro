@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LineReveal from '../components/LineReveal';
 import { getCollection, render } from 'astro:content';
-import { Image, getImage } from 'astro:assets';
 import { formatBlogDate, formatEasternRelease } from '../utilities/dates';
 import { withTerminalPeriod } from '../utilities/text';
 
@@ -23,8 +22,7 @@ const Content = rendered?.Content;
 
 let ogImage: string | undefined;
 if (post.data.cover) {
-  const optimized = await getImage({ src: post.data.cover, width: 1200 });
-  ogImage = new URL(optimized.src, Astro.site).href;
+  ogImage = new URL(post.data.cover.src, Astro.site).href;
 }
 
 const canonicalUrl = new URL(`/${post.id}/`, Astro.site).href;
@@ -91,11 +89,10 @@ const jsonLd = {
         {
           post.data.cover && (
             <div class="post__cover">
-              <Image
-                src={post.data.cover}
+              <img
+                src={post.data.cover.src}
                 alt={`Cover illustration for “${post.data.title}”`}
-                widths={[720, 960, 1280, 1600, 1920, 2400]}
-                sizes="(max-width: 959px) calc(100vw - 2rem), 55rem"
+                loading="eager"
               />
             </div>
           )
