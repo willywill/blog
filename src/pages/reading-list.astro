@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LineReveal from '../components/LineReveal';
 
+const readingListEnabled = false;
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 const readingList = alphabet.map((letter, index) => ({
@@ -33,6 +34,7 @@ const jsonLd = {
   description="An A–Z list of interesting reads, references, and saved links."
   canonicalUrl={canonicalUrl}
   jsonLd={jsonLd}
+  noindex={!readingListEnabled}
 >
   <div class="page-intro reading-list-intro">
     <p class="eyebrow">Library</p>
@@ -46,7 +48,7 @@ const jsonLd = {
     />
     <LineReveal
       as="p"
-      text="A place to collect links worth returning to. The entries are placeholders for now, but the structure is ready for the real list."
+      text="A place where I collect links of resources worth returning to."
       className="page-intro__lede"
       delay={0.12}
       stagger={0.065}
@@ -60,36 +62,50 @@ const jsonLd = {
     <span class="section-accent__bar"></span>
   </div>
 
-  <nav class="reading-index" aria-label="Reading list alphabet">
-    {
-      alphabet.map((letter) => (
-        <a href={`#reading-${letter}`}>{letter}</a>
-      ))
-    }
-  </nav>
+  {
+    readingListEnabled ? (
+      <>
+        <nav class="reading-index" aria-label="Reading list alphabet">
+          {
+            alphabet.map((letter) => (
+              <a href={`#reading-${letter}`}>{letter}</a>
+            ))
+          }
+        </nav>
 
-  <div class="reading-list">
-    {
-      readingList.map((group) => (
-        <section class="reading-group" id={`reading-${group.letter}`}>
-          <div class="reading-group__heading">
-            <p class="reading-group__letter">{group.letter}</p>
-            <span class="reading-group__rule" aria-hidden="true"></span>
-          </div>
-          <ul class="reading-group__items">
-            {
-              group.items.map((item) => (
-                <li>
-                  <a href="https://williamgermany.com" target="_blank" rel="noreferrer">
-                    <span class="reading-item__title">{item.title}.</span>
-                    <span class="reading-item__note">{item.note}</span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </section>
-      ))
-    }
-  </div>
+        <div class="reading-list">
+          {
+            readingList.map((group) => (
+              <section class="reading-group" id={`reading-${group.letter}`}>
+                <div class="reading-group__heading">
+                  <p class="reading-group__letter">{group.letter}</p>
+                  <span class="reading-group__rule" aria-hidden="true"></span>
+                </div>
+                <ul class="reading-group__items">
+                  {
+                    group.items.map((item) => (
+                      <li>
+                        <a href="https://williamgermany.com" target="_blank" rel="noreferrer">
+                          <span class="reading-item__title">{item.title}.</span>
+                          <span class="reading-item__note">{item.note}</span>
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </section>
+            ))
+          }
+        </div>
+      </>
+    ) : (
+      <section class="coming-soon" aria-labelledby="reading-list-coming-soon-title">
+        <p class="coming-soon__eyebrow">Reading List</p>
+        <h2 id="reading-list-coming-soon-title">This page is coming soon.</h2>
+        <p class="coming-soon__copy">
+          The actual reading list is staying offline until I've got enough content to publish.
+        </p>
+      </section>
+    )
+  }
 </BaseLayout>

@@ -1,10 +1,10 @@
 import React, { useId, useState } from 'react';
 
 export default function BeforeAfter({
-  beforeLabel = 'Before',
-  afterLabel = 'After',
-  beforeSrc,
-  afterSrc,
+  leftLabel = 'Before',
+  rightLabel = 'After',
+  leftSrc,
+  rightSrc,
   alt,
   initialPosition = 52,
 }) {
@@ -17,21 +17,21 @@ export default function BeforeAfter({
         <div className="before-after__frame">
           <img
             className="before-after__image"
-            src={beforeSrc.src ?? beforeSrc}
+            src={leftSrc.src ?? leftSrc}
             alt={alt}
             loading="lazy"
           />
           <div className="before-after__after">
             <img
               className="before-after__image"
-              src={afterSrc.src ?? afterSrc}
+              src={rightSrc.src ?? rightSrc}
               alt={alt}
               loading="lazy"
             />
           </div>
 
-          <span className="before-after__label before-after__label--before">{beforeLabel}</span>
-          <span className="before-after__label before-after__label--after">{afterLabel}</span>
+          <span className="before-after__label before-after__label--before">{leftLabel}</span>
+          <span className="before-after__label before-after__label--after">{rightLabel}</span>
 
           <div className="before-after__divider" aria-hidden="true">
             <span className="before-after__handle"></span>
