@@ -137,3 +137,10 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Astro
+dist/
+.astro/
+
+# Bun is the package manager for this repo (see bun.lock)
+package-lock.json

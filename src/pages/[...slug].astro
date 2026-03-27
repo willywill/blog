@@ -1,0 +1,173 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LineReveal from '../components/LineReveal';
+import { getCollection, render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import { formatBlogDate, formatEasternRelease } from '../utilities/dates';
+import { withTerminalPeriod } from '../utilities/text';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const now = Date.now();
+const isScheduled = post.data.pubDate.valueOf() > now;
+const isComingSoon = post.data.comingSoon || isScheduled;
+const rendered = isComingSoon ? null : await render(post);
+const Content = rendered?.Content;
+
+let ogImage: string | undefined;
+if (post.data.cover) {
+  const optimized = await getImage({ src: post.data.cover, width: 1200 });
+  ogImage = new URL(optimized.src, Astro.site).href;
+}
+
+const canonicalUrl = new URL(`/${post.id}/`, Astro.site).href;
+
+const all = await getCollection('blog', ({ data }) => !data.draft);
+const sorted = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const readNext = sorted.filter((p) => p.id !== post.id).slice(0, 3);
+const chronological = [...all].sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+const postNumber = chronological.findIndex((entry) => entry.id === post.id) + 1;
+const totalPosts = chronological.length;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  ...(post.data.updatedDate && {
+    dateModified: post.data.updatedDate.toISOString(),
+  }),
+  url: canonicalUrl,
+  ...(ogImage && { image: [ogImage] }),
+  author: {
+    '@type': 'Person',
+    name: 'Will Germany',
+  },
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  ogImage={ogImage}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+  noindex={isComingSoon}
+>
+  <div class="section-accent" aria-hidden="true">
+    <span class="section-accent__square"></span>
+    <span class="section-accent__bar"></span>
+  </div>
+  <div class="post-layout">
+    <div class="post-layout__top">
+      <article class="post">
+        <header class="post__hero">
+          <p class="post__count">{postNumber} / {totalPosts}</p>
+          <div class="post__hero-copy">
+            <p class="post__meta">
+              <time datetime={post.data.pubDate.toISOString()}>
+                {formatBlogDate(post.data.pubDate)}
+              </time>
+            </p>
+            <LineReveal
+              as="h1"
+              text={withTerminalPeriod(post.data.title)}
+              className="post__title"
+              stagger={0.085}
+              duration={0.62}
+              client:load
+            />
+          </div>
+        </header>
+        {
+          post.data.cover && (
+            <div class="post__cover">
+              <Image
+                src={post.data.cover}
+                alt={`Cover illustration for “${post.data.title}”`}
+                widths={[720, 960, 1280, 1600, 1920, 2400]}
+                sizes="(max-width: 959px) calc(100vw - 2rem), 55rem"
+              />
+            </div>
+          )
+        }
+      </article>
+      <aside class="read-next read-next--top" aria-labelledby="read-next-heading">
+        <h2 id="read-next-heading">Read next</h2>
+        {
+          readNext.length > 0 ? (
+            <ul>
+              {readNext.map((p) => (
+                <li>
+                  <a href={`/${p.id}/`}>{p.data.title}</a>
+                  {(p.data.comingSoon || p.data.pubDate.valueOf() > now) && (
+                    <span class="read-next__status">Coming soon</span>
+                  )}
+                  <time datetime={p.data.pubDate.toISOString()}>
+                    {formatBlogDate(p.data.pubDate, 'short')}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style="margin:0;font-size:0.9rem;color:var(--text-subtle);">More soon.</p>
+          )
+        }
+      </aside>
+    </div>
+    <article class="post post--body">
+      {
+        isComingSoon ? (
+          <section class="coming-soon" aria-labelledby="coming-soon-title">
+            <p class="coming-soon__eyebrow">Scheduled Post</p>
+            <h2 id="coming-soon-title">This post is coming soon.</h2>
+            <p class="coming-soon__schedule-label">Drops</p>
+            <p class="coming-soon__schedule">
+              <time datetime={post.data.pubDate.toISOString()}>
+                {formatEasternRelease(post.data.pubDate)}
+              </time>
+            </p>
+            <p class="coming-soon__copy">
+              The draft is offline for now. Check back when it goes live for the full piece.
+            </p>
+          </section>
+        ) : (
+          <div class="prose">
+            {Content && <Content />}
+          </div>
+        )
+      }
+      <aside class="read-next read-next--bottom" aria-labelledby="read-next-bottom-heading">
+        <h2 id="read-next-bottom-heading">Read next</h2>
+        {
+          readNext.length > 0 ? (
+            <ul>
+              {readNext.map((p) => (
+                <li>
+                  <a href={`/${p.id}/`}>{p.data.title}</a>
+                  {(p.data.comingSoon || p.data.pubDate.valueOf() > now) && (
+                    <span class="read-next__status">Coming soon</span>
+                  )}
+                  <time datetime={p.data.pubDate.toISOString()}>
+                    {formatBlogDate(p.data.pubDate, 'short')}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style="margin:0;font-size:0.9rem;color:var(--text-subtle);">More soon.</p>
+          )
+        }
+      </aside>
+    </article>
+  </div>
+</BaseLayout>

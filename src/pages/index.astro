@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AsciiBadgePair from '../components/AsciiBadgePair';
+import LineReveal from '../components/LineReveal';
+import { getCollection } from 'astro:content';
+import { formatBlogDate } from '../utilities/dates';
+import { withTerminalPeriod } from '../utilities/text';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const canonicalUrl = new URL('/', Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Blog',
+  url: canonicalUrl,
+  description: 'Essays, notes, and field reports on building thoughtful software.',
+};
+---
+
+<BaseLayout
+  title="Blog"
+  description="Essays, notes, and field reports on building thoughtful software."
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <div class="page-intro page-intro--home">
+    <div class="page-intro__copy">
+      <p class="eyebrow">Fragments</p>
+      <LineReveal
+        as="h1"
+        text="My thoughts on software, systems, and the craft around them."
+        className="page-intro__title"
+        stagger={0.085}
+        duration={0.62}
+        client:load
+      />
+      <LineReveal
+        as="p"
+        text="A running collection of essays, research, and notes spanning software, hardware, art, design, technology, culture, and more."
+        className="page-intro__lede"
+        delay={0.12}
+        stagger={0.065}
+        duration={0.58}
+        client:load
+      />
+    </div>
+    <AsciiBadgePair client:load />
+  </div>
+  <div class="section-accent" aria-hidden="true">
+    <span class="section-accent__square"></span>
+    <span class="section-accent__bar"></span>
+  </div>
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <p class="post-list__meta">
+            <time datetime={post.data.pubDate.toISOString()}>
+              {formatBlogDate(post.data.pubDate)}
+            </time>
+          </p>
+          <h2 class="post-list__title">
+            <a href={`/${post.id}/`}>{withTerminalPeriod(post.data.title)}</a>
+          </h2>
+          <span class="post-list__underline" aria-hidden="true"></span>
+          <p class="post-list__desc">{post.data.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

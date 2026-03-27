@@ -1,0 +1,92 @@
+---
+title: 'A case for DLSS 5'
+description: 'DLSS should evolve from a developer feature into an open, enthusiast-driven generative rendering mod.'
+pubDate: 2026-03-27
+cover: ../../assets/blog/dlss5-cover.jpg
+draft: false
+---
+
+import BeforeAfter from '../../components/mdx/BeforeAfter.jsx';
+import dlss5Off from '../../assets/blog/dlss5-zorah-off.jpeg';
+import dlss5On from '../../assets/blog/dlss5-zorah-on.jpeg';
+import dlss5070Performance from '../../assets/blog/dlss5070-4090-performance.jpg';
+import PathTracingDiagram from '../../components/mdx/PathTracingDiagram.jsx';
+
+DLSS or **Deep Learning Super Sampling** prior to the [announcement of DLSS 5](https://www.nvidia.com/en-us/geforce/news/dlss5-breakthrough-in-visual-fidelity-for-games/) was ultimately well received by the gaming community, developers, and artists — for offline rendering tools and especially real-time video game graphics. It started as a developer tool to tackle demanding rendering workloads, by upscaling in novel ways, utilizing dedicated hardware, neural networks and rendering to allow games to run at lower resolutions, and then be resized up to the size of the screen in ways that didn't sacrifice visual fidelity too much.
+
+Yesterday's DLSS looks nothing like what it's becoming today. It's slowly evolved from tricks to make real-time rendering a lot faster, to improving visual qualities about the underlying content.
+
+The first major step in that direction was [Frame Generation](https://nvidianews.nvidia.com/news/nvidia-introduces-dlss-3-with-breakthrough-ai-powered-frame-generation-for-up-to-4x-performance), introduced with DLSS 3. This was a significant step toward incorporating generative elements by completely synthesizing new frames inserted into the rendering pipeline, giving users the perception of a smoother image. I won't bore you with the details, but there was notably more resistance around its inclusion into the DLSS stack than anything that came before it.
+
+Then came DLSS 3.5 and the introduction of ray reconstruction — and in my view, this is where things got genuinely interesting. It did not come with much resistance. It was monumentally successful in its ability to improve the stochastic nature of path tracing elements with a low count of traced rays being emitted into the scene, and it was significantly better than other approaches to denoising at the time. (Modern approaches trace very few rays in the scene with few light bounces for performance reasons. This makes denoising essential for getting a viewable result.)
+
+<PathTracingDiagram />
+
+That contrast becomes clearer if you look at the denoising lineage that came before it:
+
+- [A-Trous wavelet filtering](https://jo.dreggn.org/home/2010_atrous.pdf): Dammertz, Sewtz, Hanika, and Lensch, *Edge-Avoiding A-Trous Wavelet Transform for Fast Global Illumination Filtering*, High Performance Graphics 2010.
+- [A-SVGF](https://cg.ivd.kit.edu/publications/2018/adaptive_temporal_filtering/adaptive_temporal_filtering.pdf): Schied et al., *Gradient Estimation for Real-Time Adaptive Temporal Filtering*, 2018.
+- [ReSTIR](https://dl.acm.org/doi/abs/10.1145/3386569.3392481): Bitterli, Wyman, Pharr, Shirley, Lefohn, and Jarosz, *Spatiotemporal Reservoir Resampling for Real-Time Ray Tracing with Dynamic Direct Lighting*, SIGGRAPH 2020.
+
+Ray reconstruction feels meaningfully different because it shifts the problem away from only filtering or resampling sparse rays and toward learned reconstruction that can preserve more of the scene's high-frequency detail.
+
+DLSS 4 is where things came to a head. Multi frame generation pushed the generative premise further, but less-than-honest marketing and added input delay clawing back the benefits of higher frame rates left a bad taste in a lot of people's mouths.
+
+<img
+  src={dlss5070Performance.src}
+  alt="NVIDIA slide showing GeForce RTX 5070 performance positioned against RTX 4090-class results through DLSS and frame generation"
+  loading="lazy"
+/>
+
+So let's recap. We went from frame generation as the first foray into generative rendering, to ray reconstruction genuinely improving the quality of path traced output, to DLSS 4 compositing many more new frames from thin air. The DLSS brand held through all of it, completing its evolution from a developer upscaling tool to something that reimagines the rendered image wholesale.
+
+Now, with the advent of DLSS 5, **I believe there is a case to be made that it is an impressive piece of technology — genuinely good, and worth having. It's just positioned entirely wrong**.
+
+---
+
+## Why this requires a developer integration
+
+DLSS 5 requires just two inputs that are composed of the output color buffer and motion vectors.
+
+```txt
+Game renders -> Motion vectors + color buffer -> DLSS generative model reconstructs frame -> Final frame presented
+```
+
+This is undoubtedly an intentional choice. Utilizing a 2D framebuffer with post-process allows them to model and extract the feel of the game's intended rendering. And using fewer inputs means less GPU compute ultimately required for this lean and fast generative model, both from a training and inference perspective.
+
+Whether or not it does a good job of this is up to the training data in the model and how well it can retain the original feel of the underlying content. And well.. the viewer's eyes.
+
+The other component involved are the motion vectors. I'd assume the motion vectors provide temporal coherency for the model and its output. Motion vectors are also why this isn't viable as anything other than a developer-integrated tool. There's a reason why [ReShade](https://reshade.me/), a popular post-process injection tool used for almost any game, cannot inject per-object motion blur. The motion vector buffer is a result of the game engine's internal knowledge of how objects are positioned in the game world and how they move over time. This information is not easily accessible as a general rendering hook and would vary from game to game.
+
+DLSS is already integrated into many game engines, public and proprietary. Their SDKs make it a lot easier to hook into, to enable the next set of technologies. NVIDIA can also dispatch engineering resources to help developers integrate it into their engines, and push fixes upstream based on their feedback. Previous versions of DLSS also already have developers passing along motion vector information. All of this process that exists already means it's much easier to just tack this onto the well-oiled machine that is DLSS than to release this as a standalone developer integration.
+
+---
+
+## There is still a place for this technology
+
+NVIDIA has some alternative options for deploying this interesting generative AI model in a way that's probably less likely to put them in a hot seat and give tinkerers and developers more control.
+
+1. Put this inside of [RTX Remix](https://www.nvidia.com/en-us/geforce/rtx-remix/). Old titles like GTA IV (my favorite game of all time), Half-Life 2, and many others are being remastered by fans of the franchise and they could pilot this with tweaking abilities that they planned to give developers.
+2. Open source the model and allow developers to further train the model towards their own ground-truth for the characters and environments they made. This also could allow communities to experiment and contribute with ways to improve some of the errors we saw in the early demos.
+3. Deploy it as a standalone modding tool that can be used to enhance any game. If NVIDIA wants to protect its source and usage amongst only NVIDIA GPUs, they could release this as a restricted API that game-specific tools like [ENB](http://enbdev.com/news.html) can hook into — since ENB already works by modifying game-specific rendering code, accessing the right buffers per game is exactly the kind of problem these types of modding tools are built to solve.
+
+Realistically, NVIDIA will never open source the model. They will probably never deploy it as a standalone modding tool. They *may* put it inside of RTX Remix, so maybe there's a chance?
+
+---
+
+## The real argument
+
+<BeforeAfter
+  leftLabel=""
+  rightLabel=""
+  leftSrc={dlss5On}
+  rightSrc={dlss5Off}
+  alt="NVIDIA DLSS 5 comparison showing the off and on versions of the Zorah tech demo scene"
+  client:visible
+/>
+
+This is a good example of the tech in action. This is, in my view, the best example they have showcasing this technology. It can be an impressive tool when they get it right. It's not without its many flaws, ethical and technical, but I'll leave those critiques out for now. I think it's been discussed by many people online already.
+
+My focus is on how we move forward from here. We should absolutely have this power. But it needs to be encapsulated and/or delivered in a way that everyone can get behind — and with far more controls.
+
+**Reader's Note:** It seems that since writing this post initially, the CEO of NVIDIA, Jensen Huang, has [suggested that this technology could eventually be prompted to adjust rendering outputs based on developer intent](https://www.youtube.com/watch?v=MH_beCDBtJc). A step in the right direction — but by all accounts, still a ways off.

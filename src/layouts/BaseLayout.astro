@@ -1,0 +1,201 @@
+---
+import '../styles/global.css';
+import 'lenis/dist/lenis.css';
+import SectionStitch from '../components/SectionStitch.astro';
+import LineReveal from '../components/LineReveal';
+
+type OgType = 'website' | 'article';
+
+interface Props {
+  title: string;
+  description: string;
+  ogType?: OgType;
+  ogImage?: string;
+  canonicalUrl: string;
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogType = 'website',
+  ogImage,
+  canonicalUrl,
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = title === 'Blog' ? title : `${title} · Blog`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/webp" href="/site-logo.webp" />
+    <link rel="apple-touch-icon" href="/site-logo.webp" />
+    <link rel="preload" as="image" href="/site-logo.webp" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      (() => {
+        const storedTheme = localStorage.getItem('blog-theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : systemDark
+            ? 'dark'
+            : 'light';
+
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="Blog" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    {
+      jsonLd && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      )
+    }
+    <script>
+      import Lenis from 'lenis';
+
+      const existingLenis = (window as typeof window & { __blogLenis?: Lenis }).__blogLenis;
+      existingLenis?.destroy();
+
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+      });
+
+      (window as typeof window & { __blogLenis?: Lenis }).__blogLenis = lenis;
+
+      const raf = (time: number) => {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      };
+
+      requestAnimationFrame(raf);
+    </script>
+    <script is:inline>
+      document.addEventListener('click', (event) => {
+        const toggle = event.target instanceof Element
+          ? event.target.closest('[data-theme-toggle]')
+          : null;
+
+        if (!toggle) return;
+
+        const root = document.documentElement;
+        const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = nextTheme;
+        root.style.colorScheme = nextTheme;
+        localStorage.setItem('blog-theme', nextTheme);
+      });
+    </script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <div class="site-glow site-glow--left" aria-hidden="true"></div>
+      <div class="site-glow site-glow--right" aria-hidden="true"></div>
+      <div class="site-glow site-glow--center" aria-hidden="true"></div>
+      <div class="site-glow site-glow--mid-left" aria-hidden="true"></div>
+      <div class="site-glow site-glow--mid-right" aria-hidden="true"></div>
+      <header class="site-header">
+        <div class="site-header__inner">
+          <a class="site-mark" href="/" aria-label="Will Germany blog home">
+            <img src="/site-logo.webp" alt="" width="30" height="30" />
+            <strong>Will Germany</strong>
+          </a>
+          <nav class="site-nav" aria-label="Primary">
+            <a href="/" class="site-nav__link">
+              <span>Blog</span>
+              <span class="site-nav__underline" aria-hidden="true"></span>
+            </a>
+            <a href="/reading-list/" class="site-nav__link">
+              <span>Reading List</span>
+              <span class="site-nav__underline" aria-hidden="true"></span>
+            </a>
+            <a href="https://williamgermany.com" class="site-nav__link">
+              <span>Portfolio</span>
+              <span class="site-nav__underline" aria-hidden="true"></span>
+            </a>
+          </nav>
+          <button type="button" class="site-theme-toggle" data-theme-toggle aria-label="Toggle color theme">
+            <svg class="site-theme-toggle__icon site-theme-toggle__icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.25"></circle>
+              <path d="M12 1.75v3.1M12 19.15v3.1M4.75 4.75l2.2 2.2M17.05 17.05l2.2 2.2M1.75 12h3.1M19.15 12h3.1M4.75 19.25l2.2-2.2M17.05 6.95l2.2-2.2"></path>
+            </svg>
+            <svg class="site-theme-toggle__icon site-theme-toggle__icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18.8 14.6A7.8 7.8 0 0 1 9.4 5.2a8.5 8.5 0 1 0 9.4 9.4Z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <SectionStitch
+          class="site-footer__stitch"
+          leftColor="var(--footer-surface)"
+          rightColor="var(--bg-alt)"
+          stepHeight="8rem"
+          stitchWidth="7.5rem"
+          trackOffset="2rem"
+        />
+        <div class="site-footer__inner">
+          <div class="site-footer__panel">
+            <p class="site-footer__eyebrow">Getting Lost?</p>
+            <LineReveal
+              as="h2"
+              text="Check out my portfolio for more about who I am and what I do!"
+              className="site-footer__title"
+              delay={0.06}
+              stagger={0.075}
+              duration={0.58}
+              client:visible
+            />
+            <p>
+              I'm a self-taught software engineer, designer, creative thinker and tinkerer with a passion for building.
+            </p>
+          </div>
+          <nav class="site-footer__links" aria-label="Footer">
+            <a
+              class="site-footer__link-icon"
+              href="https://github.com/willywill"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+            >
+              <svg viewBox="0 0 98 96" aria-hidden="true">
+                <path d="M48.854 0C21.839 0 0 21.839 0 48.855c0 21.596 13.993 39.92 33.405 46.381 2.427.449 3.316-1.054 3.316-2.363 0-1.165-.043-5.052-.068-9.164-13.59 2.956-16.454-5.763-16.454-5.763-2.223-5.647-5.425-7.151-5.425-7.151-4.436-3.034.336-2.973.336-2.973 4.91.346 7.495 5.039 7.495 5.039 4.365 7.482 11.45 5.32 14.246 4.07.443-3.162 1.706-5.32 3.105-6.544-10.848-1.234-22.262-5.424-22.262-24.145 0-5.332 1.906-9.691 5.032-13.111-.504-1.234-2.18-6.202.476-12.93 0 0 4.106-1.313 13.45 5.008 3.902-1.085 8.087-1.628 12.245-1.647 4.158.02 8.35.562 12.26 1.647 9.332-6.32 13.43-5.008 13.43-5.008 2.664 6.728.99 11.696.486 12.93 3.133 3.42 5.024 7.779 5.024 13.111 0 18.768-11.434 22.897-22.315 24.104 1.757 1.517 3.324 4.504 3.324 9.075 0 6.55-.06 11.833-.06 13.443 0 1.322.874 2.836 3.332 2.357C84.014 88.771 98 70.447 98 48.855 98 21.839 76.159 0 48.854 0Z"></path>
+              </svg>
+            </a>
+            <a href="https://williamgermany.com">Portfolio</a>
+            <a href="/rss.xml">RSS</a>
+            <a href="mailto:me@williamgermany.com">Email</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
