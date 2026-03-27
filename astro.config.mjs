@@ -5,9 +5,12 @@ import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.williamgermany.com',
+
   markdown: {
     shikiConfig: {
       themes: {
@@ -16,5 +19,7 @@ export default defineConfig({
       },
     },
   },
+
   integrations: [mdx(), react(), sitemap()],
+  adapter: cloudflare(),
 });
