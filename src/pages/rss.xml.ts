@@ -11,7 +11,7 @@ export const GET: APIRoute = async (context) => {
   posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
   return rss({
-    title: 'Blog',
+    title: 'Will Germany — Blog',
     description: 'Essays, notes, and field reports on building thoughtful software.',
     site: context.site ?? 'https://blog.williamgermany.com',
     items: posts.map((post) => ({

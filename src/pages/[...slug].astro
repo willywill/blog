@@ -21,10 +21,18 @@ const isComingSoon = post.data.comingSoon || isScheduled;
 const rendered = isComingSoon ? null : await render(post);
 const Content = rendered?.Content;
 
+const coverAlt = post.data.cover
+  ? `Cover illustration for “${post.data.title}”`
+  : undefined;
+
 let ogImage: string | undefined;
+let ogImageWidth: number | undefined;
+let ogImageHeight: number | undefined;
 if (post.data.cover) {
   const optimized = await getImage({ src: post.data.cover, width: 1200 });
   ogImage = new URL(optimized.src, Astro.site).href;
+  ogImageWidth = optimized.attributes.width;
+  ogImageHeight = optimized.attributes.height;
 }
 
 const canonicalUrl = new URL(`/${post.id}/`, Astro.site).href;
@@ -59,6 +67,11 @@ const jsonLd = {
   description={post.data.description}
   ogType="article"
   ogImage={ogImage}
+  ogImageWidth={ogImageWidth}
+  ogImageHeight={ogImageHeight}
+  ogImageAlt={coverAlt}
+  articlePublishedTime={post.data.pubDate.toISOString()}
+  articleModifiedTime={post.data.updatedDate?.toISOString()}
   canonicalUrl={canonicalUrl}
   jsonLd={jsonLd}
   noindex={isComingSoon}
@@ -93,7 +106,7 @@ const jsonLd = {
             <div class="post__cover">
               <Image
                 src={post.data.cover}
-                alt={`Cover illustration for “${post.data.title}”`}
+                alt={coverAlt ?? ''}
                 widths={[720, 960, 1280, 1600, 1920, 2400]}
                 sizes="(max-width: 959px) calc(100vw - 2rem), 55rem"
               />

@@ -1,0 +1,22 @@
+# Will Germany — Blog
+
+> Essays, notes, and field reports on software, systems, and craft.
+
+## Site
+
+- Canonical: https://blog.williamgermany.com/
+- Author: Will Germany (software engineer, designer, builder)
+- Portfolio: https://williamgermany.com/
+
+## Feeds and discovery
+
+- RSS (full text summaries + links): https://blog.williamgermany.com/rss.xml
+- Sitemap: https://blog.williamgermany.com/sitemap-index.xml
+
+## Citation
+
+When summarizing or quoting, prefer linking to the canonical URL of each post (shown in the page URL and `<link rel="canonical">`). Do not reproduce long excerpts without attribution and a link to the source.
+
+## Optional
+
+- Reading list (when published): https://blog.williamgermany.com/reading-list/

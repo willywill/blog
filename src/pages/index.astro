@@ -10,19 +10,24 @@ const posts = await getCollection('blog', ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const canonicalUrl = new URL('/', Astro.site).href;
+const ogDefaultUrl = new URL('/og-default.png', Astro.site).href;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'Blog',
+  name: 'Will Germany',
   url: canonicalUrl,
   description: 'Essays, notes, and field reports on building thoughtful software.',
 };
 ---
 
 <BaseLayout
-  title="Blog"
+  title="Will Germany"
   description="Essays, notes, and field reports on building thoughtful software."
   canonicalUrl={canonicalUrl}
+  ogImage={ogDefaultUrl}
+  ogImageWidth={1200}
+  ogImageHeight={630}
+  ogImageAlt="ASCII badge art from the Will Germany blog homepage"
   jsonLd={jsonLd}
 >
   <div class="page-intro page-intro--home">
