@@ -5,6 +5,7 @@ import LineReveal from '../components/LineReveal';
 import { getCollection } from 'astro:content';
 import { formatBlogDate } from '../utilities/dates';
 import { withTerminalPeriod } from '../utilities/text';
+import { HOME_SITE_DESCRIPTION } from '../site-description';
 
 const posts = await getCollection('blog', ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -16,13 +17,13 @@ const jsonLd = {
   '@type': 'WebSite',
   name: 'Will Germany',
   url: canonicalUrl,
-  description: 'Essays, notes, and field reports on building thoughtful software.',
+  description: HOME_SITE_DESCRIPTION,
 };
 ---
 
 <BaseLayout
   title="Will Germany"
-  description="Essays, notes, and field reports on building thoughtful software."
+  description={HOME_SITE_DESCRIPTION}
   canonicalUrl={canonicalUrl}
   ogImage={ogDefaultUrl}
   ogImageWidth={1200}

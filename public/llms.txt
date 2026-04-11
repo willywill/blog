@@ -1,6 +1,6 @@
 # Will Germany — Blog
 
-> Essays, notes, and field reports on software, systems, and craft.
+> My thoughts on software, systems, and the craft around them. A running collection of essays, research, and notes spanning software, hardware, art, design, technology, culture, and more.
 
 ## Site
 
