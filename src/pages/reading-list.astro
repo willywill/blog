@@ -2,24 +2,119 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LineReveal from '../components/LineReveal';
 
-const readingListEnabled = false;
-const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const readingListEnabled = true;
 
-const readingList = alphabet.map((letter, index) => ({
-  letter,
-  items: [
-    {
-      title: `${letter}rticles on taste, systems, and software craft`,
-      note: 'A sharp essay worth revisiting when thinking about product feel and technical restraint.',
-    },
-    {
-      title: `${letter} field note on design-heavy web interactions`,
-      note: 'A reference for motion, pacing, and how small transitions change perceived quality.',
-    },
-  ],
-}));
+const readingItems = [
+  {
+    title: 'Autoresearch',
+    note: "Karpathy's experiment in AI agents running research on single-GPU nanochat training automatically.",
+    url: 'https://github.com/karpathy/autoresearch',
+  },
+  {
+    title: 'Build Your Own Database',
+    note: "NaN's step-by-step guide to building a key-value database from scratch.",
+    url: 'https://www.nan.fyi/database',
+  },
+  {
+    title: 'B-trees and database indexes',
+    note: "PlanetScale's visual guide to how B-trees organize database indexes and make lookups efficient.",
+    url: 'https://planetscale.com/blog/btrees-and-database-indexes',
+  },
+  {
+    title: 'Bit Twiddling Hacks',
+    note: "Sean Eron Anderson's classic reference for low-level bit manipulation techniques and integer tricks.",
+    url: 'https://graphics.stanford.edu/~seander/bithacks.html?hl=en-US',
+  },
+  {
+    title: 'DesEngs: Resources for Design Engineers',
+    note: 'A curated collection of articles, tools, people, and references for design engineers.',
+    url: 'https://desengs.com/',
+  },
+  {
+    title: 'Inside NVIDIA GPUs: Anatomy of high performance matmul kernels',
+    note: "Aleksa Gordic's deep dive into NVIDIA GPU architecture, PTX/SASS, tensor cores, and fast matmul kernel design.",
+    url: 'https://www.aleksagordic.com/blog/matmul',
+  },
+  {
+    title: 'IO devices and latency',
+    note: "PlanetScale's interactive tour of storage media, latency, SSD behavior, and local versus network-attached IO.",
+    url: 'https://planetscale.com/blog/io-devices-and-latency',
+  },
+  {
+    title: 'Lights and Shadows',
+    note: "Bartosz Ciechanowski's interactive explanation of light, shadows, reflection, color, and radiance.",
+    url: 'https://ciechanow.ski/lights-and-shadows/',
+  },
+  {
+    title: 'Lets build GPT from scratch',
+    note: "Andrej Karpathy's hands-on walkthrough of building a GPT-style language model from first principles.",
+    url: 'https://youtu.be/kCc8FmEb1nY',
+  },
+  {
+    title: 'Logging Sucks: Your Logs Are Lying To You',
+    note: 'A sharp critique of traditional logging and a case for richer, queryable context through wide events.',
+    url: 'https://loggingsucks.com/',
+  },
+  {
+    title: 'Making Software',
+    note: 'A collected resource on building better software, from engineering judgment to product craft.',
+    url: 'https://www.makingsoftware.com/',
+  },
+  {
+    title: 'On Rendering the Sky, Sunsets, and Planets',
+    note: "Maxime Heckel's deep dive into atmospheric scattering, shaders, LUTs, and browser-rendered skies.",
+    url: 'https://blog.maximeheckel.com/posts/on-rendering-the-sky-sunsets-and-planets/',
+  },
+  {
+    title: 'Radiance Cascades: Building Real-Time Global Illumination',
+    note: "Jason McGhee's interactive walkthrough of radiance cascades, probes, ray intervals, and real-time indirect lighting.",
+    url: 'https://jason.today/rc#radiance-cascades-enabled',
+  },
+  {
+    title: 'Reservoir Sampling',
+    note: "Sam Rose's interactive explanation of fair random sampling when the input size is unknown.",
+    url: 'https://samwho.dev/reservoir-sampling/',
+  },
+  {
+    title: 'Graphics Programming - Where To Start?',
+    note: "Stefan Pijnacker's beginner-friendly roadmap of math, graphics APIs, rendering techniques, and shader resources.",
+    url: 'https://stefanpijnacker.nl/article/graphics-programming-where-to-start/',
+  },
+  {
+    title: 'How to Scale a Ledger',
+    note: "Modern Treasury's introduction to scalable double-entry ledger databases for products that move money.",
+    url: 'https://www.moderntreasury.com/journal/how-to-scale-a-ledger-part-i',
+  },
+  {
+    title: 'How I cut GTA Online loading times by 70%',
+    note: 'A memorable reverse-engineering story about profiling GTA Online and removing a huge startup bottleneck.',
+    url: 'https://nee.lv/2021/02/28/How-I-cut-GTA-Online-loading-times-by-70/',
+  },
+  {
+    title: 'Fast Inverse Square Root',
+    note: 'A video explanation of the classic fast inverse square root trick and why it became such a famous graphics programming artifact.',
+    url: 'https://www.youtube.com/watch?v=p8u_k2LIZyo',
+  },
+  {
+    title: 'How Ray Tracing Works & How To Do It 600x Faster',
+    note: 'A video walkthrough of ray tracing fundamentals and the acceleration ideas that make it dramatically faster.',
+    url: 'https://youtu.be/gsZiJeaMO48',
+  },
+];
+
+const readingList = Object.values(
+  readingItems.reduce<Record<string, { letter: string; items: typeof readingItems }>>((groups, item) => {
+    const letter = item.title.charAt(0).toUpperCase();
+    groups[letter] ??= { letter, items: [] };
+    groups[letter].items.push(item);
+    return groups;
+  }, {}),
+).sort((a, b) => a.letter.localeCompare(b.letter));
+
+const alphabet = readingList.map((group) => group.letter);
 
 const canonicalUrl = new URL('/reading-list/', Astro.site).href;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
@@ -85,7 +180,7 @@ const jsonLd = {
                   {
                     group.items.map((item) => (
                       <li>
-                        <a href="https://williamgermany.com" target="_blank" rel="noreferrer">
+                        <a href={item.url} target="_blank" rel="noreferrer">
                           <span class="reading-item__title">{item.title}.</span>
                           <span class="reading-item__note">{item.note}</span>
                         </a>
